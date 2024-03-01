@@ -4,6 +4,7 @@ import 'package:docking/src/internal/widgets/docking_item_widget.dart';
 import 'package:docking/src/internal/widgets/docking_tabs_widget.dart';
 import 'package:docking/src/layout/docking_layout.dart';
 import 'package:docking/src/on_item_close.dart';
+import 'package:docking/src/on_item_focused.dart';
 import 'package:docking/src/on_item_selection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -15,6 +16,7 @@ class Docking extends StatefulWidget {
       {Key? key,
       this.layout,
       this.onItemSelection,
+      this.onItemFocusChanged,
       this.onItemClose,
       this.itemCloseInterceptor,
       this.dockingButtonsBuilder,
@@ -26,6 +28,7 @@ class Docking extends StatefulWidget {
 
   final DockingLayout? layout;
   final OnItemSelection? onItemSelection;
+  final OnItemFocusChanged? onItemFocusChanged;
   final OnItemClose? onItemClose;
   final ItemCloseInterceptor? itemCloseInterceptor;
   final DockingButtonsBuilder? dockingButtonsBuilder;
@@ -100,6 +103,7 @@ class _DockingState extends State<Docking> {
           dockingDrag: _dockingDrag,
           item: area,
           onItemSelection: widget.onItemSelection,
+          onItemFocusChanged: widget.onItemFocusChanged,
           itemCloseInterceptor: widget.itemCloseInterceptor,
           onItemClose: widget.onItemClose,
           dockingButtonsBuilder: widget.dockingButtonsBuilder,
@@ -116,6 +120,7 @@ class _DockingState extends State<Docking> {
             dockingDrag: _dockingDrag,
             item: area.childAt(0),
             onItemSelection: widget.onItemSelection,
+            onItemFocusChanged: widget.onItemFocusChanged,
             itemCloseInterceptor: widget.itemCloseInterceptor,
             onItemClose: widget.onItemClose,
             dockingButtonsBuilder: widget.dockingButtonsBuilder,
@@ -127,6 +132,7 @@ class _DockingState extends State<Docking> {
           dockingDrag: _dockingDrag,
           dockingTabs: area,
           onItemSelection: widget.onItemSelection,
+          onItemFocusChanged: widget.onItemFocusChanged,
           onItemClose: widget.onItemClose,
           itemCloseInterceptor: widget.itemCloseInterceptor,
           dockingButtonsBuilder: widget.dockingButtonsBuilder,

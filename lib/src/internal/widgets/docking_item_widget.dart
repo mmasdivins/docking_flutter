@@ -6,6 +6,7 @@ import 'package:docking/src/internal/widgets/drop/drop_feedback_widget.dart';
 import 'package:docking/src/layout/docking_layout.dart';
 import 'package:docking/src/layout/drop_position.dart';
 import 'package:docking/src/on_item_close.dart';
+import 'package:docking/src/on_item_focused.dart';
 import 'package:docking/src/on_item_selection.dart';
 import 'package:docking/src/theme/docking_theme.dart';
 import 'package:docking/src/theme/docking_theme_data.dart';
@@ -22,6 +23,7 @@ class DockingItemWidget extends StatefulWidget {
       required this.dockingDrag,
       required this.item,
       this.onItemSelection,
+      this.onItemFocusChanged,
       this.onItemClose,
       this.itemCloseInterceptor,
       this.dockingButtonsBuilder,
@@ -31,6 +33,7 @@ class DockingItemWidget extends StatefulWidget {
   final DockingLayout layout;
   final DockingItem item;
   final OnItemSelection? onItemSelection;
+  final OnItemFocusChanged? onItemFocusChanged;
   final OnItemClose? onItemClose;
   final ItemCloseInterceptor? itemCloseInterceptor;
   final DockingButtonsBuilder? dockingButtonsBuilder;
@@ -44,6 +47,15 @@ class DockingItemWidget extends StatefulWidget {
 class DockingItemWidgetState extends State<DockingItemWidget>
     with DraggableConfigMixin {
   DropPosition? _activeDropPosition;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.item.focusNode?.addListener(() {
+      widget.onItemFocusChanged?.call(widget.item, widget.item.focusNode!.hasFocus);
+    });
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -88,9 +100,13 @@ class DockingItemWidgetState extends State<DockingItemWidget>
     ];
     TabbedViewController controller = TabbedViewController(tabs);
 
-    OnTabSelection? onTabSelection;
+    OnTabSelection onTabSelection = (int? index) {
+      widget.item.requestFocus();
+    };
+
     if (widget.onItemSelection != null) {
       onTabSelection = (int? index) {
+        widget.item.requestFocus();
         if (index != null) {
           widget.onItemSelection!(widget.item);
         }
@@ -103,6 +119,10 @@ class DockingItemWidgetState extends State<DockingItemWidget>
         tabCloseInterceptor: _tabCloseInterceptor,
         onTabClose: _onTabClose,
         controller: controller,
+        tabSelectInterceptor: (i) {
+          widget.item.requestFocus();
+          return true;
+        },
         onDraggableBuild:
             (TabbedViewController controller, int tabIndex, TabData tabData) {
           return buildDraggableConfig(
@@ -162,3 +182,4 @@ class DockingItemWidgetState extends State<DockingItemWidget>
     }
   }
 }
+

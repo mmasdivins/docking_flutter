@@ -1,6 +1,7 @@
 import 'package:docking/src/docking_buttons_builder.dart';
 import 'package:docking/src/layout/docking_layout.dart';
 import 'package:docking/src/on_item_close.dart';
+import 'package:docking/src/on_item_focused.dart';
 import 'package:docking/src/on_item_selection.dart';
 
 class DockingProvider {
@@ -8,6 +9,7 @@ class DockingProvider {
       {required this.layout,
       required this.onItemSelection,
       required this.onItemClose,
+      required this.onItemFocused,
       required this.itemCloseInterceptor,
       required this.dockingButtonsBuilder,
       required this.maximizableItem,
@@ -17,6 +19,7 @@ class DockingProvider {
 
   final DockingLayout? layout;
   final OnItemSelection? onItemSelection;
+  final OnItemFocusChanged? onItemFocused;
   final OnItemClose? onItemClose;
   final ItemCloseInterceptor? itemCloseInterceptor;
   final DockingButtonsBuilder? dockingButtonsBuilder;

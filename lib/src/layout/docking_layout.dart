@@ -5,6 +5,8 @@ import 'package:docking/src/internal/layout/layout_stringify.dart';
 import 'package:docking/src/internal/layout/move_item.dart';
 import 'package:docking/src/internal/layout/remove_item.dart';
 import 'package:docking/src/internal/layout/remove_item_by_id.dart';
+import 'package:docking/src/internal/widgets/docking_item_focus_node.dart';
+import 'package:docking/src/internal/widgets/docking_item_widget.dart';
 import 'package:docking/src/layout/area_builder.dart';
 import 'package:docking/src/layout/docking_area_type.dart';
 import 'package:docking/src/layout/drop_position.dart';
@@ -286,6 +288,31 @@ class DockingItem extends DockingArea with DropArea {
   bool _maximized;
 
   bool get maximized => _maximized;
+
+  void requestFocus() {
+    if (widget is! DockingItemFocusNode) return;
+
+    final focusNode =
+        (widget as DockingItemFocusNode).focusNode;
+
+    if (focusNode.hasFocus) return;
+
+    focusNode.requestFocus();
+  }
+
+  bool hasFocus() {
+    if (widget is! DockingItemFocusNode) return false;
+
+    final focusNode =
+        (widget as DockingItemFocusNode).focusNode;
+
+    return focusNode.hasFocus;
+  }
+
+  FocusNode? get focusNode {
+    if (widget is! DockingItemFocusNode) return null;
+    return (widget as DockingItemFocusNode).focusNode;
+  }
 
   @override
   DockingAreaType get type => DockingAreaType.item;

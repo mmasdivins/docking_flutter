@@ -12,5 +12,6 @@ export 'src/docking_icons.dart';
 export 'src/docking.dart';
 export 'src/theme/docking_theme.dart';
 export 'src/theme/docking_theme_data.dart';
+export 'src/internal/widgets/docking_item_focus_node.dart';
 export 'package:multi_split_view/multi_split_view.dart';
 export 'package:tabbed_view/tabbed_view.dart';

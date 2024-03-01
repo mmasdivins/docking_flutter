@@ -8,6 +8,7 @@ import 'package:docking/src/internal/widgets/drop/drop_feedback_widget.dart';
 import 'package:docking/src/layout/docking_layout.dart';
 import 'package:docking/src/layout/drop_position.dart';
 import 'package:docking/src/on_item_close.dart';
+import 'package:docking/src/on_item_focused.dart';
 import 'package:docking/src/on_item_selection.dart';
 import 'package:docking/src/theme/docking_theme.dart';
 import 'package:docking/src/theme/docking_theme_data.dart';
@@ -22,6 +23,7 @@ class DockingTabsWidget extends StatefulWidget {
       required this.dockingDrag,
       required this.dockingTabs,
       this.onItemSelection,
+      this.onItemFocusChanged,
       this.onItemClose,
       this.itemCloseInterceptor,
       this.dockingButtonsBuilder,
@@ -32,6 +34,7 @@ class DockingTabsWidget extends StatefulWidget {
   final DockingLayout layout;
   final DockingTabs dockingTabs;
   final OnItemSelection? onItemSelection;
+  final OnItemFocusChanged? onItemFocusChanged;
   final OnItemClose? onItemClose;
   final ItemCloseInterceptor? itemCloseInterceptor;
   final DockingButtonsBuilder? dockingButtonsBuilder;
@@ -46,6 +49,17 @@ class DockingTabsWidget extends StatefulWidget {
 class DockingTabsWidgetState extends State<DockingTabsWidget>
     with DraggableConfigMixin {
   DropPosition? _activeDropPosition;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.dockingTabs.forEach((child) {
+      child.focusNode?.addListener(() {
+        widget.onItemFocusChanged?.call(child, child.focusNode!.hasFocus);
+      });
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -95,11 +109,18 @@ class DockingTabsWidgetState extends State<DockingTabsWidget>
     Widget tabbedView = TabbedView(
         controller: controller,
         tabsAreaButtonsBuilder: _tabsAreaButtonsBuilder,
+        tabSelectInterceptor: (index) {
+          var item = widget.dockingTabs.childAt(index);
+          item.requestFocus();
+          return true;
+        },
         onTabSelection: (int? index) {
           if (index != null) {
+            var item = widget.dockingTabs.childAt(index);
+            item.requestFocus();
             widget.dockingTabs.selectedIndex = index;
             if (widget.onItemSelection != null) {
-              widget.onItemSelection!(widget.dockingTabs.childAt(index));
+              widget.onItemSelection!(item);
             }
           }
         },
