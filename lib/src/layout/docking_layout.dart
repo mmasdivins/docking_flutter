@@ -289,7 +289,7 @@ class DockingItem extends DockingArea with DropArea {
 
   bool get maximized => _maximized;
 
-  void requestFocus() {
+  void requestFocus(BuildContext context) {
     if (widget is! DockingItemFocusNode) return;
 
     final focusNode =
@@ -297,7 +297,7 @@ class DockingItem extends DockingArea with DropArea {
 
     if (focusNode.hasFocus) return;
 
-    focusNode.requestFocus();
+    FocusScope.of(context).requestFocus(focusNode);
   }
 
   bool hasFocus() {

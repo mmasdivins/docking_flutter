@@ -101,12 +101,12 @@ class DockingItemWidgetState extends State<DockingItemWidget>
     TabbedViewController controller = TabbedViewController(tabs);
 
     OnTabSelection onTabSelection = (int? index) {
-      widget.item.requestFocus();
+      widget.item.requestFocus(context);
     };
 
     if (widget.onItemSelection != null) {
       onTabSelection = (int? index) {
-        widget.item.requestFocus();
+        widget.item.requestFocus(context);
         if (index != null) {
           widget.onItemSelection!(widget.item);
         }
@@ -120,7 +120,7 @@ class DockingItemWidgetState extends State<DockingItemWidget>
         onTabClose: _onTabClose,
         controller: controller,
         tabSelectInterceptor: (i) {
-          widget.item.requestFocus();
+          widget.item.requestFocus(context);
           return true;
         },
         onDraggableBuild:

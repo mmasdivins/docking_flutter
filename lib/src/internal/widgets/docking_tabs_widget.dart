@@ -111,13 +111,13 @@ class DockingTabsWidgetState extends State<DockingTabsWidget>
         tabsAreaButtonsBuilder: _tabsAreaButtonsBuilder,
         tabSelectInterceptor: (index) {
           var item = widget.dockingTabs.childAt(index);
-          item.requestFocus();
+          item.requestFocus(context);
           return true;
         },
         onTabSelection: (int? index) {
           if (index != null) {
             var item = widget.dockingTabs.childAt(index);
-            item.requestFocus();
+            item.requestFocus(context);
             widget.dockingTabs.selectedIndex = index;
             if (widget.onItemSelection != null) {
               widget.onItemSelection!(item);
