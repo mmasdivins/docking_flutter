@@ -297,7 +297,9 @@ class DockingItem extends DockingArea with DropArea {
 
     if (focusNode.hasFocus) return;
 
-    FocusScope.of(context).requestFocus(focusNode);
+    Future.delayed(kThemeAnimationDuration, () {
+      FocusScope.of(context).requestFocus(focusNode);
+    });
   }
 
   bool hasFocus() {
