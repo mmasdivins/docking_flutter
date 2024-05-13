@@ -60,6 +60,12 @@ class DockingTabsWidgetState extends State<DockingTabsWidget>
     });
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+
+  }
+
 
   @override
   Widget build(BuildContext context) {
