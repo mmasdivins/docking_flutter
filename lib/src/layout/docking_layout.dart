@@ -486,6 +486,32 @@ class DockingTabs extends DockingParentArea with DropArea {
 
   bool get maximized => _maximized;
 
+  TabbedViewController? _tabbedViewController;
+  TabbedViewController? get tabbedViewController => _tabbedViewController;
+
+  void setTabbedViewController(TabbedViewController tabbedViewController) {
+    _tabbedViewController = tabbedViewController;
+  }
+
+  /// Selects the item if it exists on the tabview
+  void selectItem(DockingItem item) {
+    if (_tabbedViewController != null) {
+      TabData? tabData;
+      for (var t in _tabbedViewController!.tabs) {
+        if ((t.value as DockingItem).id == item.id) {
+          tabData = t;
+          break;
+        }
+      }
+
+      if (tabData != null) {
+        _tabbedViewController!.selectedIndex = tabData.index;
+      }
+
+    }
+  }
+
+
   @override
   DockingItem childAt(int index) => _children[index] as DockingItem;
 

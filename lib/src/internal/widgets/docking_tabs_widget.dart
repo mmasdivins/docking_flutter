@@ -109,6 +109,9 @@ class DockingTabsWidgetState extends State<DockingTabsWidget>
           buttons: buttons));
     });
     TabbedViewController controller = TabbedViewController(tabs);
+
+    widget.dockingTabs.setTabbedViewController(controller);
+
     controller.selectedIndex =
         math.min(widget.dockingTabs.selectedIndex, tabs.length - 1);
 
