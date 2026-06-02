@@ -1,5 +1,5 @@
 import 'package:docking/src/docking_buttons_builder.dart';
-import 'package:docking/src/docking_drag.dart';
+import 'package:docking/src/drag_over_position.dart';
 import 'package:docking/src/internal/widgets/draggable_config_mixin.dart';
 import 'package:docking/src/internal/widgets/drop/content_wrapper.dart';
 import 'package:docking/src/internal/widgets/drop/drop_feedback_widget.dart';
@@ -11,6 +11,7 @@ import 'package:docking/src/on_item_selection.dart';
 import 'package:docking/src/theme/docking_theme.dart';
 import 'package:docking/src/theme/docking_theme_data.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:meta/meta.dart';
 import 'package:tabbed_view/tabbed_view.dart';
 
@@ -20,14 +21,15 @@ class DockingItemWidget extends StatefulWidget {
   DockingItemWidget(
       {Key? key,
       required this.layout,
-      required this.dockingDrag,
+      required this.dragOverPosition,
       required this.item,
       this.onItemSelection,
       this.onItemFocusChanged,
       this.onItemClose,
       this.itemCloseInterceptor,
       this.dockingButtonsBuilder,
-      required this.maximizable})
+      required this.maximizable,
+      required this.draggable})
       : super(key: key);
 
   final DockingLayout layout;
@@ -38,7 +40,8 @@ class DockingItemWidget extends StatefulWidget {
   final ItemCloseInterceptor? itemCloseInterceptor;
   final DockingButtonsBuilder? dockingButtonsBuilder;
   final bool maximizable;
-  final DockingDrag dockingDrag;
+  final DragOverPosition dragOverPosition;
+  final bool draggable;
 
   @override
   State<StatefulWidget> createState() => DockingItemWidgetState();
@@ -96,7 +99,8 @@ class DockingItemWidgetState extends State<DockingItemWidget>
           content: content,
           closable: widget.item.closable,
           leading: widget.item.leading,
-          buttons: buttons)
+          buttons: buttons,
+          draggable: widget.draggable)
     ];
     TabbedViewController controller = TabbedViewController(tabs);
 
@@ -123,18 +127,19 @@ class DockingItemWidgetState extends State<DockingItemWidget>
           widget.item.requestFocus(context);
           return true;
         },
-        onDraggableBuild:
-            (TabbedViewController controller, int tabIndex, TabData tabData) {
-          return buildDraggableConfig(
-              dockingDrag: widget.dockingDrag, tabData: tabData);
-        },
+        onDraggableBuild: widget.draggable
+            ? (TabbedViewController controller, int tabIndex, TabData tabData) {
+                return buildDraggableConfig(
+                    dockingDrag: widget.dragOverPosition, tabData: tabData);
+              }
+            : null,
         contentBuilder: (context, tabIndex) => ItemContentWrapper(
             listener: _updateActiveDropPosition,
             layout: widget.layout,
             dockingItem: widget.item,
             child: controller.tabs[tabIndex].content!),
-        onBeforeDropAccept: _onBeforeDropAccept);
-    if (widget.dockingDrag.enable) {
+        onBeforeDropAccept: widget.draggable ? _onBeforeDropAccept : null);
+    if (widget.draggable && widget.dragOverPosition.enable) {
       return DropFeedbackWidget(
           dropPosition: _activeDropPosition, child: tabbedView);
     }
@@ -155,8 +160,12 @@ class DockingItemWidgetState extends State<DockingItemWidget>
 
   void _updateActiveDropPosition(DropPosition? dropPosition) {
     if (_activeDropPosition != dropPosition) {
-      setState(() {
-        _activeDropPosition = dropPosition;
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          setState(() {
+            _activeDropPosition = dropPosition;
+          });
+        }
       });
     }
   }

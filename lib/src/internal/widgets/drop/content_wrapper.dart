@@ -21,49 +21,43 @@ abstract class ContentWrapperBase extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-      List<Widget> children = [Positioned.fill(child: child)];
+      builder: (BuildContext context, BoxConstraints constraints) {
+        const double centerWidthRatio = 50;
+        final double centerWidth = centerWidthRatio * constraints.maxWidth / 100;
+        final double horizontalEdgeWidth = (constraints.maxWidth - centerWidth) / 2;
+        final double verticalEdgeHeight = constraints.maxHeight / 2;
 
-      // percentage of width reserved for detecting center area
-      const double centerWidthRatio = 50;
-      // reserved width to detect center area
-      final double centerWidth = centerWidthRatio * constraints.maxWidth / 100;
-      // reserved width to detect left and right areas
-      final double horizontalEdgeWidth =
-          (constraints.maxWidth - centerWidth) / 2;
-      // height reserved for detecting the top and bottom areas
-      final double verticalEdgeHeight = constraints.maxHeight / 2;
-
-      children.add(Positioned(
-          child: buildDropAnchor(DropPosition.left),
-          width: horizontalEdgeWidth,
-          bottom: 0,
-          top: 0,
-          left: 0));
-
-      children.add(Positioned(
-          child: buildDropAnchor(DropPosition.right),
-          width: horizontalEdgeWidth,
-          bottom: 0,
-          top: 0,
-          right: 0));
-
-      children.add(Positioned(
-          child: buildDropAnchor(DropPosition.top),
-          height: verticalEdgeHeight,
-          top: 0,
-          left: horizontalEdgeWidth,
-          right: horizontalEdgeWidth));
-
-      children.add(Positioned(
-          child: buildDropAnchor(DropPosition.bottom),
-          height: verticalEdgeHeight,
-          bottom: 0,
-          left: horizontalEdgeWidth,
-          right: horizontalEdgeWidth));
-
-      return Stack(children: children);
-    });
+        return Stack(
+          children: [
+            Positioned.fill(child: child),
+            Positioned(
+              child: buildDropAnchor(DropPosition.left),
+              width: horizontalEdgeWidth,
+              bottom: 0, top: 0, left: 0,
+            ),
+            Positioned(
+              child: buildDropAnchor(DropPosition.right),
+              width: horizontalEdgeWidth,
+              bottom: 0, top: 0, right: 0,
+            ),
+            Positioned(
+              child: buildDropAnchor(DropPosition.top),
+              height: verticalEdgeHeight,
+              top: 0,
+              left: horizontalEdgeWidth,
+              right: horizontalEdgeWidth,
+            ),
+            Positioned(
+              child: buildDropAnchor(DropPosition.bottom),
+              height: verticalEdgeHeight,
+              bottom: 0,
+              left: horizontalEdgeWidth,
+              right: horizontalEdgeWidth,
+            ),
+          ],
+        );
+      },
+    );
   }
 
   DropAnchorBaseWidget buildDropAnchor(DropPosition dropPosition);

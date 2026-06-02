@@ -1,5 +1,5 @@
 import 'package:docking/src/docking_buttons_builder.dart';
-import 'package:docking/src/docking_drag.dart';
+import 'package:docking/src/drag_over_position.dart';
 import 'package:docking/src/internal/widgets/docking_item_widget.dart';
 import 'package:docking/src/internal/widgets/docking_tabs_widget.dart';
 import 'package:docking/src/layout/docking_layout.dart';
@@ -7,6 +7,7 @@ import 'package:docking/src/on_item_close.dart';
 import 'package:docking/src/on_item_focused.dart';
 import 'package:docking/src/on_item_selection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:multi_split_view/multi_split_view.dart';
 
@@ -23,7 +24,8 @@ class Docking extends StatefulWidget {
       this.maximizableItem = true,
       this.maximizableTab = true,
       this.maximizableTabsArea = true,
-      this.antiAliasingWorkaround = true})
+      this.antiAliasingWorkaround = true,
+      this.draggable = true})
       : super(key: key);
 
   final DockingLayout? layout;
@@ -36,6 +38,7 @@ class Docking extends StatefulWidget {
   final bool maximizableTab;
   final bool maximizableTabsArea;
   final bool antiAliasingWorkaround;
+  final bool draggable;
 
   @override
   State<StatefulWidget> createState() => _DockingState();
@@ -43,19 +46,19 @@ class Docking extends StatefulWidget {
 
 /// The [Docking] state.
 class _DockingState extends State<Docking> {
-  final DockingDrag _dockingDrag = DockingDrag();
+  final DragOverPosition _dragOverPosition = DragOverPosition();
 
   @override
   void initState() {
     super.initState();
-    _dockingDrag.addListener(_forceRebuild);
+    _dragOverPosition.addListener(_forceRebuild);
     widget.layout?.addListener(_forceRebuild);
   }
 
   @override
   void dispose() {
     super.dispose();
-    _dockingDrag.removeListener(_forceRebuild);
+    _dragOverPosition.removeListener(_forceRebuild);
     widget.layout?.removeListener(_forceRebuild);
   }
 
@@ -100,7 +103,8 @@ class _DockingState extends State<Docking> {
       return DockingItemWidget(
           key: area.key,
           layout: widget.layout!,
-          dockingDrag: _dockingDrag,
+          dragOverPosition: _dragOverPosition,
+          draggable: widget.draggable,
           item: area,
           onItemSelection: widget.onItemSelection,
           onItemFocusChanged: widget.onItemFocusChanged,
@@ -117,7 +121,8 @@ class _DockingState extends State<Docking> {
         return DockingItemWidget(
             key: area.key,
             layout: widget.layout!,
-            dockingDrag: _dockingDrag,
+            dragOverPosition: _dragOverPosition,
+            draggable: widget.draggable,
             item: area.childAt(0),
             onItemSelection: widget.onItemSelection,
             onItemFocusChanged: widget.onItemFocusChanged,
@@ -129,7 +134,8 @@ class _DockingState extends State<Docking> {
       return DockingTabsWidget(
           key: area.key,
           layout: widget.layout!,
-          dockingDrag: _dockingDrag,
+          dragOverPosition: _dragOverPosition,
+          draggable: widget.draggable,
           dockingTabs: area,
           onItemSelection: widget.onItemSelection,
           onItemFocusChanged: widget.onItemFocusChanged,
@@ -172,8 +178,17 @@ class _DockingState extends State<Docking> {
   }
 
   void _forceRebuild() {
-    setState(() {
-      // just rebuild
-    });
+    // Si estem en mig d'un frame de layout (persistentCallbacks = layout/paint),
+    // diferim el setState al postFrame per evitar l'assert
+    // _debugCanPerformMutations de Flutter 3.38+ quan un OverlayPortal
+    // s'activa durant el performLayout del nou widget inserit.
+    final phase = SchedulerBinding.instance.schedulerPhase;
+    if (phase == SchedulerPhase.persistentCallbacks) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) setState(() {});
+      });
+    } else {
+      setState(() {});
+    }
   }
 }

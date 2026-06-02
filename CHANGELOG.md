@@ -1,3 +1,18 @@
+## 1.16.2
+
+* Bugfix
+  * Defer state updates during drag-and-drop to prevent layout collisions in split-view panes.
+
+## 1.16.1
+
+* Bugfix
+  * The `removeItemById` method does not preserving id.
+
+## 1.16.0
+
+* `Docking`
+  * Allow to disable draggable
+
 ## 1.15.0
 
 * `DockingLayout`
